@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
+  
 /* CSS goes here. */
 
 </style>
@@ -12,12 +12,15 @@
 
 /* JavaScript goes here. */
 
-var width = 960,
-    height = 1160;
+var width = 1000,
+    height = 500;
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
+
+var projection = d3.geoAlbersUsa()
+.scale(1000)
 
 d3.json("counties.json").then( function(uk) {
 
@@ -25,8 +28,13 @@ d3.json("counties.json").then( function(uk) {
   svg.selectAll("path")
       .data(topojson.feature(uk, uk.objects.counties).features)
 	.enter().append("path")
+	.attr("fill", "white")
+	.attr("stroke", "black")
 // .data(topojson.feature(us, us.objects.counties).features)
-      .attr("d", d3.geoPath().projection(d3.geoMercator()));
+      .attr("d", d3.geoPath().projection(projection))
+	.on("mouseover", function (d) {
+	    d3.select(this).attr("fill", "red")
+	})
 
 });
 
