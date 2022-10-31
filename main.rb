@@ -1,16 +1,38 @@
-require 'uri'
-require 'net/http'
-require 'openssl'
+require 'csv'
+# 1 -> year
+# 4 -> county
+# 5 -> total_pop 
 
-url = URI("https://www.jailbase.com/api/1/recent/?source_id=nj-bcso")
 
-http = Net::HTTP.new(url.host, url.port)
-http.use_ssl = true
-http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+class FormData
 
-request = Net::HTTP::Get.new(url)
-request["x-rapidapi-host"] = 'random-facts2.p.rapidapi.com'
-request["x-rapidapi-key"] = 'your-rapidapi-key'
-response = http.request(request)
+  def extract_county county
 
-puts response.read_body
+    county.split[0]
+
+  end
+
+
+  def data_based_on_year year
+    final_struct = {} 
+    csv = CSV.read("incarceration_trends.csv")
+    total = 0
+
+    # csv.each do | item |
+
+    csv.each do | row |
+
+      if row[1] == "2012"
+        final_struct[extract_county(row[4]).to_sym] = row[5]
+      end
+    end
+
+    # end
+
+      final_struct.length
+
+  end
+end
+
+form = FormData.new
+pp form.data_based_on_year "2012"

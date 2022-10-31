@@ -12,12 +12,16 @@
 
 /* JavaScript goes here. */
 
-var width = 1000,
-    height = 500;
+var width = 1300,
+    height = 1000;
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
+
+  var svg2 = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height)
 
 var projection = d3.geoAlbersUsa()
 .scale(1000)
@@ -37,5 +41,10 @@ d3.json("counties.json").then( function(uk) {
 	})
 
 });
+
+  d3.csv("incarceration_trends_jail_jurisdiction.csv")
+    .then(function (d) {
+	console.log(d)
+    })
 
 </script>
