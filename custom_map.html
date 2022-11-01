@@ -28,21 +28,26 @@ var svg2 = d3.select("body").append("svg")
 var projection = d3.geoAlbersUsa()
 .scale(1000)
 
-  d3.csv("county-prison.csv").then(function(county) {
+  d3.csv("csv/county-prison-1978.csv").then(function(county) {
 
   //     console.log(county)
 var color = d3.scaleQuantize()
 .range(["#feebe2","#fcc5c0","#fa9fb5","#f768a1","#c51b8a","#7a0177"])
-.domain([d3.min(county, d => d.jail ), d3.max(county, d => d.jail)])
+.domain([d3.min(county, d => d.rate ), d3.max(county, d => d.rate)])
 
       
       d3.json("counties.json").then( function(uk) {
+      states = topojson.feature(uk, uk.objects.states)
+      statemap = new Map(states.features.map(d => [d.id, d]))
+	  console.log(statemap)
 	  
       for (var i = 0; i < county.length; i++) {
 
 	  var county_name = county[i].county
 
-	  var val = county[i].jail
+	  var val = county[i].rate
+	  var year = county[i].year
+
 
 
 	  for (var j = 0; j < uk.objects.counties.geometries.length; j++) {
@@ -50,9 +55,12 @@ var color = d3.scaleQuantize()
 
 
 	      if (county_name == map_name) {
-		  console.log("match")
-		  uk.objects.counties.geometries[j].properties["value"] = val
-			      break;
+		  if (uk.objects.counties.geometries[j].properties.years == undefined) {
+		      uk.objects.counties.geometries[j].properties["years"] = {}
+		  }
+		  uk.objects.counties.geometries[j].properties["years"][year] = val 
+		  break
+
 	      }
 	      
 	  }
@@ -63,13 +71,17 @@ var color = d3.scaleQuantize()
 	      .data(topojson.feature(uk, uk.objects.counties).features)
 	      .enter().append("path")
 	      .attr("stroke", "black")
-	  // .data(topojson.feature(us, us.objects.counties).features)
 			      .attr("d", d3.geoPath().projection(projection))
 			      .attr("fill", function(d) {
-			      value = d.properties.value
-			      console.log(value)
-			      if (value) {
-			        return color(value)
+				  console.log(d.properties.years["1978"])
+				  if (d.properties.years == undefined) {
+			              return color("#ccc")
+				  }
+				  else {
+				      value = d.properties.years["1978"]
+				      return color(value)
+				  }
+			      if (value != undefined) {
 			      } else {
 			        return "#ccc"
 			      }

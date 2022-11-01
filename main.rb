@@ -1,10 +1,19 @@
 require 'csv'
 # 1 -> year
+# 3 -> state
 # 4 -> county
 # 5 -> total_pop 
 
 
 class FormData
+
+  attr_accessor :years
+
+  def initialize
+
+    @years = (1970..2018)
+
+  end
 
   def extract_county county
 
@@ -13,33 +22,47 @@ class FormData
   end
 
 
-  def data_based_on_year year
-    final_struct = [] 
+
+
+  def data_based_on_year 
     csv = CSV.read("incarceration_trends.csv")
     total = 0
 
     # csv.each do | item |
 
-    csv.each do | row |
+    @years.each do | year |
 
-      if row[1] == "2012"
-        final_struct << [extract_county(row[4]), row[5]]
+      pp year
+    final_struct = [] 
+
+      csv.each do | row |
+
+        if (row[1].to_i == year) 
+          final_struct << [row[2], extract_county(row[4]), row[95], row[1]]
+        end 
+
       end
+
+      puts "Writing for #{year}"
+      write_to_csv final_struct, year
+
     end
 
     # end
 
-      final_struct
-
   end
-  def write_to_csv data
-    CSV.open("./county-prison.csv", "wb") do | csv |
+  def write_to_csv data, year
+    CSV.open("./csv/county-prison-#{year}.csv", "wb") do | csv |
 
+      csv << ["fips", "county", "rate", "year"] 
 
-      csv << ["county", "jail"] 
       data.each do | row |
 
-        csv << [row[0], row[1]]
+        if row[1] == nil
+          row[1] = 0
+        end
+
+        csv << [row[0], row[1], row[2], row[3]]
 
       end
 
@@ -48,4 +71,4 @@ class FormData
 end
 
 form = FormData.new
-form.write_to_csv(form.data_based_on_year "2012")
+form.data_based_on_year
