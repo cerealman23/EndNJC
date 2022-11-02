@@ -23,8 +23,6 @@ var svg2 = d3.select("body").append("svg")
       .attr("width", width)
       .attr("height", height)
 
-
-
 var projection = d3.geoAlbersUsa()
 .scale(1000)
 
@@ -39,46 +37,46 @@ var color = d3.scaleQuantize()
       d3.json("counties.json").then( function(uk) {
       states = topojson.feature(uk, uk.objects.states)
       statemap = new Map(states.features.map(d => [d.id, d]))
-	  console.log(statemap)
+
 	  
       for (var i = 0; i < county.length; i++) {
 
 	  var county_name = county[i].county
-
 	  var val = county[i].rate
 	  var year = county[i].year
+	  var fips = county[i].fips.slice(0,2)
 
-
+	  console.log(county)
 
 	  for (var j = 0; j < uk.objects.counties.geometries.length; j++) {
+
 	      map_name = uk.objects.counties.geometries[j].properties.name
+	      id = uk.objects.counties.geometries[j].id.slice(0,2)
 
-
-	      if (county_name == map_name) {
-		  if (uk.objects.counties.geometries[j].properties.years == undefined) {
-		      uk.objects.counties.geometries[j].properties["years"] = {}
-		  }
-		  uk.objects.counties.geometries[j].properties["years"][year] = val 
-		  break
+	      if (map_name == county_name && fips == id) {
+//		  if (uk.objects.counties.geometries[j].properties.years == undefined) {
+//		      uk.objects.counties.geometries[j].properties["years"] = {}
+//		  }
+//		  uk.objects.counties.geometries[j].properties["years"][year] = val 
+//		  break
+                  uk.objects.counties.geometries[j].properties.values = val
 
 	      }
 	      
 	  }
 	  
       }
-	  console.log(uk);
 	  svg.selectAll("path")
 	      .data(topojson.feature(uk, uk.objects.counties).features)
 	      .enter().append("path")
 	      .attr("stroke", "black")
 			      .attr("d", d3.geoPath().projection(projection))
 			      .attr("fill", function(d) {
-				  console.log(d.properties.years["1978"])
-				  if (d.properties.years == undefined) {
+				  if (d.properties.values == undefined) {
 			              return color("#ccc")
 				  }
 				  else {
-				      value = d.properties.years["1978"]
+				      value = d.properties.values
 				      return color(value)
 				  }
 			      if (value != undefined) {

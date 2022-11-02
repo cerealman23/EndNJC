@@ -34,11 +34,13 @@ class FormData
 
       pp year
     final_struct = [] 
-
       csv.each do | row |
-
         if (row[1].to_i == year) 
-          final_struct << [row[2], extract_county(row[4]), row[95], row[1]]
+          fips = row[2]
+          if row[2].length < 5
+            fips = fips.insert(0, "0")
+          end
+          final_struct << [fips, extract_county(row[4]), row[95], row[1]]
         end 
 
       end
