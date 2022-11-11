@@ -34,7 +34,9 @@ class FormData
 
       pp year
     final_struct = [] 
+    count = 0
       csv.each do | row |
+        count += 1
         if (row[1].to_i == year) 
           fips = row[2]
           if row[2].length < 5
@@ -44,6 +46,8 @@ class FormData
         end 
 
       end
+
+      pp count
 
       puts "Writing for #{year}"
       write_to_csv final_struct, year
