@@ -12,6 +12,10 @@
 
 /* JavaScript goes here. */
 
+// This is where I add all the html elements 
+
+
+  
 var width = 1300,
     height = 1000;
 
@@ -19,82 +23,87 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
+var tooltip = d3.select('body')
+    .append('div')
+      .attr('width', '200')
+      .attr('height', '200')
+       .style("position", "absolute")
+      // .style("visibility", "hidden")
+      .text("I'm a circle!")
+    .attr('color', 'white')
+.style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+
 var svg2 = d3.select("body").append("svg")
       .attr("width", width)
       .attr("height", height)
 
-var projection = d3.geoAlbersUsa()
-.scale(1000)
+var projection = d3.geoAlbersUsa().scale(1000)
 
-  d3.csv("csv/county-prison-1977.csv").then(function(county) {
+d3.csv("csv/county-prison-1987.csv").then(function(county) {
 
   //     console.log(county)
-var color = d3.scaleQuantize()
-.range(["#feebe2","#fcc5c0","#fa9fb5","#f768a1","#c51b8a","#7a0177"])
+    var color = d3.scaleQuantize()
+    .range(["#feebe2","#fcc5c0","#fa9fb5","#f768a1","#c51b8a","#7a0177"])
     .domain([d3.min(county, d => parseFloat(d.rate) ), d3.max(county, d => parseFloat(d.rate))])
-      console.log(d3.max(county, d => parseFloat(d.rate)))
+      // debugging log for easy viewing of the data
+    console.log(d3.max(county, d => parseFloat(d.rate)))
       
-      d3.json("counties.json").then( function(uk) {
-      states = topojson.feature(uk, uk.objects.states)
-      statemap = new Map(states.features.map(d => [d.id, d]))
-
-	  
-	  console.log(uk)
-      for (var i = 0; i < county.length; i++) {
-
-	  var county_name = county[i].county
-	  var val = parseFloat(county[i].rate)
-	  var year = county[i].year
-	  var fips = county[i].fips.slice(0,2)
-
-
-	  for (var j = 0; j < uk.objects.counties.geometries.length; j++) {
-
-	      map_name = uk.objects.counties.geometries[j].properties.name
-	      id = uk.objects.counties.geometries[j].id.slice(0,2)
-
-	      if (map_name == county_name && fips == id) {
-//		  if (uk.objects.counties.geometries[j].properties.years == undefined) {
-//		      uk.objects.counties.geometries[j].properties["years"] = {}
-//		  }
-//		  uk.objects.counties.geometries[j].properties["years"][year] = val 
-//		  break
-                  uk.objects.counties.geometries[j].properties.values = val
-
-	      }
-	      
-	  }
-	  
-      }
-	  svg.selectAll("path")
-	      .data(topojson.feature(uk, uk.objects.counties).features)
-	      .enter().append("path")
-	      .attr("stroke", "black")
-			      .attr("d", d3.geoPath().projection(projection))
-			      .attr("fill", function(d) {
-				  if (isNaN(d.properties.values)) {
-			              return color(0)
-
-				  }
-				  else {
-				      value = d.properties.values
-				      return color(value)
-				  }
-			      }).attr("prop", function (d) {return d.properties.values })
-	      .on("mouseover", function (d) {
-		  sel = d3.select(this).attr("fill", "red")
-		  console.log(sel)
-	      })
-
-	  
-      });
-      
-  })
-  
-
-  // d3.csv("incarceration_trends_jail_jurisdiction.csv")
-  //   .then(function (d) {
-  // 	console.log(d)
-  //   })
+    d3.json("counties.json").then( function(uk) {
+	states = topojson.feature(uk, uk.objects.states)
+	statemap = new Map(states.features.map(d => [d.id, d]))
+	
+	
+	console.log(uk)
+	for (var i = 0; i < county.length; i++) {
+	    
+	    var county_name = county[i].county
+	    var val = parseFloat(county[i].total_pop)
+	    var year = county[i].year
+	    var fips = county[i].fips.slice(0,2)
+	    
+	    
+	    for (var j = 0; j < uk.objects.counties.geometries.length; j++) {
+		
+		map_name = uk.objects.counties.geometries[j].properties.name
+		id = uk.objects.counties.geometries[j].id.slice(0,2)
+		
+		if (map_name == county_name && fips == id) {
+                    uk.objects.counties.geometries[j].properties.values = val
+		    
+		}
+	    }
+	}
+	
+	svg.selectAll("path")
+	    .data(topojson.feature(uk, uk.objects.counties).features)
+	    .enter().append("path")
+	    .attr("stroke", "black")
+	    .attr("d", d3.geoPath().projection(projection))
+	    .attr("fill", function(d) {
+		// all void data is set to a white color
+		if (isNaN(d.properties.values)) {
+		    return color(0)
+		}
+		else {
+		    value = d.properties.values
+		    return color(value)
+		}
+	    })
+	// prop is a debugging attrubute
+	    .attr("prop", function (d) {return d.properties.values })
+	    .on("mouseover", function (d) {
+		tooltip.style('visisbility', 'visible')
+		tooltip.text(d3.select(this).attr('prop'))
+	    })
+	    .on("mousemove", function (d) {
+              return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
+	    })
+    });
+    
+})
   
 </script>
