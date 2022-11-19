@@ -51,13 +51,10 @@ background: black;
  <link rel="stylesheet" href="style.css">
 <script src="//d3js.org/d3.v7.min.js" charset="utf-8"></script>
 <script src="//d3js.org/topojson.v1.min.js"></script>
+<script src="https://unpkg.com/d3-simple-slider"></script>
 
-
-
-<div class="slider">
-<input type="range" min="0" max="200" value="100" oninput="rangeValue.innerText = this.value">
-<p id="rangeValue">100</p>
-</div>
+<p id="value"></p>
+<div id="slider"></div>
 
 <script>
 
@@ -65,8 +62,8 @@ background: black;
 
 // This is where I add all the html elements 
 
-var slider = d3.select("body").append('div').attr("id", 'slider')
-  
+
+
   
 var width = 1300,
     height = 1000;
@@ -95,6 +92,30 @@ var svg2 = d3.select("body").append("svg")
 
 var projection = d3.geoAlbersUsa().scale(1000)
 
+
+
+    var file = 'county-prison-1970'
+
+  var slider = d3
+    .sliderHorizontal()
+    .min(1970)
+    .max(2015)
+    .step(1)
+    .width(300)
+    .displayValue(false)
+    .on('onchange', (val) => {
+        file = 'county-prison-'
+	file += val
+	console.log(file)
+    });
+
+  d3.select('#slider')
+    .append('svg')
+    .attr('width', 500)
+    .attr('height', 100)
+    .append('g')
+    .attr('transform', 'translate(30,30)')
+    .call(slider);
 d3.csv("csv/county-prison-2015.csv").then(function(county) {
 
   //     console.log(county)
@@ -126,7 +147,10 @@ colors =
 var r_max = d3.max(county, d => parseFloat(d.total_pop))
 var r_min = d3.min(county, d => parseFloat(d.total_pop))
 
-d3.select('.slider').select('input').attr('min',r_min ).attr('max',r_max) 
+
+
+
+// d3.select('.slider').select('input').attr('min',r_min ).attr('max',r_max) 
 
 var color = d3.scaleQuantize()
 
@@ -134,7 +158,8 @@ var color = d3.scaleQuantize()
     .domain([d3.min(county, d => parseFloat(d.total_pop) ), d3.max(county, d => parseFloat(d.total_pop))])
       // debugging log for easy viewing of the data
     console.log(d3.max(county, d => parseFloat(d.total_pop)))
-      
+
+    
     d3.json("counties.json").then( function(uk) {
 	states = topojson.feature(uk, uk.objects.states)
 	statemap = new Map(states.features.map(d => [d.id, d]))
