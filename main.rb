@@ -42,7 +42,7 @@ class FormData
           if row[2].length < 5
             fips = fips.insert(0, "0")
           end
-          final_struct << [fips, extract_county(row[4]), row[95], row[1], row[5]]
+          final_struct << [fips, extract_county(row[4]), row[95], row[1], row[5], row[20]]
         end 
 
       end
@@ -60,7 +60,7 @@ class FormData
   def write_to_csv data, year
     CSV.open("./csv/county-prison-#{year}.csv", "wb") do | csv |
 
-      csv << ["fips", "county", "rate", "year", "total_pop"] 
+      csv << ["fips", "county", "rate", "year", "total_pop", "jail_pop"] 
 
       data.each do | row |
 
@@ -68,7 +68,7 @@ class FormData
           row[1] = 0
         end
 
-        csv << [row[0], row[1], row[2], row[3], row[4]]
+        csv << [row[0], row[1], row[2], row[3], row[4], row[5]]
 
       end
 
