@@ -17,7 +17,7 @@ var svg = maps.append("svg")
     .attr("height", height);
 
 var svg_state = state_map.append("svg")
-    .attr("width", width * 0.25)
+    .attr("width", width )
     .attr("class", "state-map")
     .attr("height", height);
 
@@ -163,17 +163,25 @@ var color = d3.scaleQuantize()
 
 
 
-    
+    var feature = topojson.feature(uk, uk.objects.states)
+	.features
+	.filter(function(d) {return d.id == "20";})[0]
 
-    svg_state.selectAll("path")
-	.data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
-	.enter().append("path")
+    var state_projection = d3.geoIdentity()
+	.reflectY(true)
+	.fitSize([900, 500], feature)
+    
+    console.log(feature)
+
+    svg_state.append("path")
+	// .data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
+	.datum(feature)
 	.attr("stroke", "red")
 	.attr("stroke-width", "7")
 	.attr("fill", "white")
-	.attr("d", d3.geoPath().projection(projection))
+	.attr("d", d3.geoPath().projection(state_projection))
 	.classed("state", true)
-        .attr("s", d => {console.log(d)} )
+        // .attr("s", d => {console.log(d)} )
 
     svg.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
