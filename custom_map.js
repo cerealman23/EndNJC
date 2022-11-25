@@ -9,15 +9,16 @@ var width = 1300,
     height = 1000;
 
 var maps = d3.select("body").select(".row").select(".map")
+var state_map = d3.select("body").select(".row").select(".state")
 
 var svg = maps.append("svg")
     .attr("width", width)
     .attr("class", "state-map")
     .attr("height", height);
 
-var svg_state = maps.append("svg")
-    .attr("width", width)
-    .attr("class", "county-map")
+var svg_state = state_map.append("svg")
+    .attr("width", width * 0.25)
+    .attr("class", "state-map")
     .attr("height", height);
 
 var tooltip = d3.select('body')
@@ -83,7 +84,6 @@ var color = d3.scaleQuantize()
 
 	function change_map (file) {
 	console.log(file)
-	    console.log("Here")
     d3.csv('csv/' + file + '.csv').then( function(county) {
 
     color.range(colors)
@@ -110,19 +110,29 @@ var color = d3.scaleQuantize()
 	    }
 	    
 	}
-	// svg.selectAll("path")
 
-	//     .attr("fill", function(d) {
-	// 	// all void data is set to a white color
-	// 	if (isNaN(d.properties.values)) {
-	// 	    return color(0)
-	// 	}
-	// 	else {
-	// 	    value = d.properties.values
-	// 	    return color(value)
-	// 	}
-	//     })
-	//     .attr("prop", function (d) {return d.properties.values })
+
+	svg.selectAll(".state")
+	    .attr("stroke", "red")
+	    .attr("stroke-width", "7")
+	    .attr("fill", "white")
+
+	svg.selectAll(".county")
+	    .attr("fill-opacity", "1")
+	    .attr("fill", function(d) {
+		// all void data is set to a white color
+		if (isNaN(d.properties.values)) {
+		    return color(0)
+		}
+		else {
+		    value = d.properties.values
+		    return color(value)
+		}
+	    })
+	    .attr("prop", function (d) {return d.properties.values })
+
+
+	
         })};	
 
 	//     .attr("fill", function(d) {
@@ -153,6 +163,18 @@ var color = d3.scaleQuantize()
 
 
 
+    
+
+    svg_state.selectAll("path")
+	.data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
+	.enter().append("path")
+	.attr("stroke", "red")
+	.attr("stroke-width", "7")
+	.attr("fill", "white")
+	.attr("d", d3.geoPath().projection(projection))
+	.classed("state", true)
+        .attr("s", d => {console.log(d)} )
+
     svg.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
 	.enter().append("path")
@@ -164,10 +186,12 @@ var color = d3.scaleQuantize()
 	    console.log("I am malcolm")
 	    d3.select(this).attr("fill", "blue")
 	})
+	.classed("state", true)
 
     svg.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.counties).features)
 	.enter().append("path")
+        .attr("fill", "white")
         .attr("fill-opacity", "0.0")
         .attr("pointer-events", "none")
         .attr("stroke", "black")
