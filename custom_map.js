@@ -159,44 +159,51 @@ var color = d3.scaleQuantize()
             //   return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
 	    // })
 
-    
+    function display_state (state_id) {
 
+	svg_state.selectAll("path").remove()
 
-
-    var feature = topojson.feature(uk, uk.objects.states)
-	.features
-	.filter(function(d) {return d.id == "20";})[0]
-
-    var state_projection = d3.geoIdentity()
-	.reflectY(true)
-	.fitSize([900, 500], feature)
-    
-    console.log(feature)
-
-    svg_state.append("path")
+	var feature = topojson.feature(uk, uk.objects.states)
+	    .features
+	    .filter(function(d) {return d.id == state_id;})[0]
+	
+	var state_projection = d3.geoIdentity()
+	    .reflectY(true)
+	    .fitSize([900, 500], feature)
+	
+	console.log(feature)
+	
+	svg_state.append("path")
 	// .data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
-	.datum(feature)
-	.attr("stroke", "red")
-	.attr("stroke-width", "7")
-	.attr("fill", "white")
-	.attr("d", d3.geoPath().projection(state_projection))
-	.classed("state", true)
+	    .datum(feature)
+	    .attr("stroke", "red")
+	    .attr("stroke-width", "7")
+	    .attr("fill", "white")
+	    .attr("d", d3.geoPath().projection(state_projection))
+	    .classed("state", true)
         // .attr("s", d => {console.log(d)} )
-
+	
+    }
+    
     svg.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
 	.enter().append("path")
 	.attr("stroke", "red")
 	.attr("stroke-width", "7")
 	.attr("fill", "white")
+        .attr("state-id", d => d.id)
 	.attr("d", d3.geoPath().projection(projection))
         .on("mouseover", function (d) {
-	    console.log("I am malcolm")
+
+	    state_id = d3.select(this).attr("state-id")
+	    display_state(state_id)
 	    d3.select(this).attr("fill", "blue")
+
 	})
 	.classed("state", true)
 
     svg.selectAll("path")
+
 	.data(topojson.feature(uk, uk.objects.counties).features)
 	.enter().append("path")
         .attr("fill", "white")
@@ -205,4 +212,5 @@ var color = d3.scaleQuantize()
         .attr("stroke", "black")
 	.attr("d", d3.geoPath().projection(projection))
         .classed("county", true)
+
     });
