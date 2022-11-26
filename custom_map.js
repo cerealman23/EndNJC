@@ -14,10 +14,10 @@ var svg = maps.append("svg")
     .attr("class", "state-map")
     .attr("height", height);
 
-var state_borders = svg.append("g").classed("borders", true)// .attr("class", "borders")
 
 var county_borders = svg.append("g").classed("countys", true)// .attr("class", "countys")
 
+var state_borders = svg.append("g").classed("borders", true)// .attr("class", "borders")
 var svg_state = state_map.append("svg")
     .attr("width", width )
     .attr("class", "state-map")
@@ -114,12 +114,9 @@ var color = d3.scaleQuantize()
 	}
 
 
-	svg.selectAll(".state")
-	    .attr("stroke", "red")
-	    .attr("stroke-width", "7")
-	    .attr("fill", "white")
 
-	svg.selectAll(".county")
+
+	county_borders.selectAll("path")
 	    .attr("fill-opacity", "1")
 	    .attr("fill", function(d) {
 		// all void data is set to a white color
@@ -133,6 +130,10 @@ var color = d3.scaleQuantize()
 	    })
 	    .attr("prop", function (d) {return d.properties.values })
 	
+	state_borders.selectAll("path")
+	    .attr("stroke", "red")
+	    .attr("stroke-width", "7")
+	    .attr("fill", "white")
         })};	
 
 	//     .attr("fill", function(d) {
@@ -190,20 +191,18 @@ var color = d3.scaleQuantize()
 	
     }
 
-    county_borders.selectAll("path")
-	.data(topojson.feature(uk, uk.objects.counties).features)
-	.enter().append("path")
-        .attr("fill", "white")
-        .attr("fill-opacity", "0.0")
-        .attr("pointer-events", "none")
-        .attr("stroke", "black")
-	.attr("d", d3.geoPath().projection(projection))
-        .classed("county", true)
+
+
+
+
+
+
 
     state_borders.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
 	.enter().append("path")
-	.attr("stroke", "red")
+        .attr("fill-opacity", "0.0")
+	.attr("stroke", "blue")
 	.attr("stroke-width", "7")
 	.attr("fill", "white")
         .attr("state-id", d => d.id)
@@ -211,10 +210,21 @@ var color = d3.scaleQuantize()
         .on("mouseover", function (d) {
 
 	    state_id = d3.select(this).attr("state-id")
-	    display_state(state_id)
+	    // display_state(state_id)
 	    d3.select(this).attr("fill", "blue")
 
 	})
 	.classed("state", true)
+
+    county_borders.selectAll("path")
+	.data(topojson.feature(uk, uk.objects.counties).features)
+	.enter().append("path")
+        .attr("fill", "white")
+        .attr("fill-opacity", "0.0")
+        .attr("pointer-events", "none")
+        .attr("stroke", "red")
+	.attr("d", d3.geoPath().projection(projection))
+        .classed("county", true)
+
 
     });
