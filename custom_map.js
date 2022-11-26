@@ -163,19 +163,24 @@ var color = d3.scaleQuantize()
 
 	svg_state.selectAll("path").remove()
 
-	var feature = topojson.feature(uk, uk.objects.states)
+	var counties = topojson.feature(uk, uk.objects.counties)
+	    .features
+	    .filter(function(d) {return d.id.slice(0,2) == state_id;})
+	
+	var state = topojson.feature(uk, uk.objects.states)
 	    .features
 	    .filter(function(d) {return d.id == state_id;})[0]
-	
+
 	var state_projection = d3.geoIdentity()
 	    .reflectY(true)
-	    .fitSize([900, 500], feature)
+	    .fitSize([900, 500], state)
 	
-	console.log(feature)
+	console.log(state)
 	
-	svg_state.append("path")
+	svg_state.append("path")// selectAll("path")
 	// .data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
-	    .datum(feature)
+	    .datum(state)
+	    // .enter().append("path")
 	    .attr("stroke", "red")
 	    .attr("stroke-width", "7")
 	    .attr("fill", "white")
