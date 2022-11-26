@@ -1,20 +1,22 @@
-
-
 /* JavaScript goes here. */
 
 // This is where I add all the html elements 
-
   
 var width = 1300,
     height = 1000;
 
 var maps = d3.select("body").select(".row").select(".map")
+
 var state_map = d3.select("body").select(".row").select(".state")
 
 var svg = maps.append("svg")
     .attr("width", width)
     .attr("class", "state-map")
     .attr("height", height);
+
+var state_borders = svg.append("g").classed("borders", true)// .attr("class", "borders")
+
+var county_borders = svg.append("g").classed("countys", true)// .attr("class", "countys")
 
 var svg_state = state_map.append("svg")
     .attr("width", width )
@@ -130,8 +132,6 @@ var color = d3.scaleQuantize()
 		}
 	    })
 	    .attr("prop", function (d) {return d.properties.values })
-
-
 	
         })};	
 
@@ -176,11 +176,11 @@ var color = d3.scaleQuantize()
 	    .fitSize([900, 500], state)
 	
 	console.log(state)
-	
-	svg_state.append("path")// selectAll("path")
+	state
+	svg_state.selectAll("path")
 	// .data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
-	    .datum(state)
-	    // .enter().append("path")
+	    .data(counties)
+	    .enter().append("path")
 	    .attr("stroke", "red")
 	    .attr("stroke-width", "7")
 	    .attr("fill", "white")
@@ -189,8 +189,18 @@ var color = d3.scaleQuantize()
         // .attr("s", d => {console.log(d)} )
 	
     }
-    
-    svg.selectAll("path")
+
+    county_borders.selectAll("path")
+	.data(topojson.feature(uk, uk.objects.counties).features)
+	.enter().append("path")
+        .attr("fill", "white")
+        .attr("fill-opacity", "0.0")
+        .attr("pointer-events", "none")
+        .attr("stroke", "black")
+	.attr("d", d3.geoPath().projection(projection))
+        .classed("county", true)
+
+    state_borders.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
 	.enter().append("path")
 	.attr("stroke", "red")
@@ -206,16 +216,5 @@ var color = d3.scaleQuantize()
 
 	})
 	.classed("state", true)
-
-    svg.selectAll("path")
-
-	.data(topojson.feature(uk, uk.objects.counties).features)
-	.enter().append("path")
-        .attr("fill", "white")
-        .attr("fill-opacity", "0.0")
-        .attr("pointer-events", "none")
-        .attr("stroke", "black")
-	.attr("d", d3.geoPath().projection(projection))
-        .classed("county", true)
 
     });
