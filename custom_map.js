@@ -113,9 +113,6 @@ var color = d3.scaleQuantize()
 	    
 	}
 
-
-
-
 	county_borders.selectAll("path")
 	    .attr("fill-opacity", "1")
 	    .attr("fill", function(d) {
@@ -131,9 +128,26 @@ var color = d3.scaleQuantize()
 	    .attr("prop", function (d) {return d.properties.values })
 	
 	state_borders.selectAll("path")
-	    .attr("stroke", "red")
+	    .attr("stroke", "blue")
 	    .attr("stroke-width", "7")
 	    .attr("fill", "white")
+	    .on("mouseover", function (d) {
+		tooltip.style('visisbility', 'visible')
+		tooltip.text("State : " + d3.select(this).attr("name") + " population ")
+		state_id = d3.select(this).attr("state-id")
+		display_state(state_id)
+		d3.select(this).attr("fill", "blue")
+		d3.select(this).attr("fill-opacity", "1")
+	    })
+
+	    .on("mousemove", function (d) {
+		return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
+	    })
+	    .on("mouseout", function(d) {
+		d3.select(this).attr("fill", "white")
+		d3.select(this).attr("fill-opacity", "0")
+	    })
+
         })};	
 
 	//     .attr("fill", function(d) {
@@ -151,15 +165,6 @@ var color = d3.scaleQuantize()
 	//     .attr("prop", function (d) {return d.properties.values })
         // .attr("pointer-events", "none")
 
-	    // .on("mouseover", function (d) {
-	    // 	tooltip.style('visisbility', 'visible')
-	    // 	tooltip.text("County: " + d3.select(this).attr("name") + " population " + d3.select(this).attr('prop'))
-	    // })
-
-	    // .on("mousemove", function (d) {
-            //   return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
-	    // })
-
     function display_state (state_id) {
 
 	svg_state.selectAll("path").remove()
@@ -176,8 +181,6 @@ var color = d3.scaleQuantize()
 	    .reflectY(true)
 	    .fitSize([900, 500], state)
 	
-	console.log(state)
-	state
 	svg_state.selectAll("path")
 	// .data(topojson.feature(uk, uk.objects.states).features.filter(function(d) {return d.id == "06"; }))
 	    .data(counties)
@@ -185,18 +188,25 @@ var color = d3.scaleQuantize()
 	    .attr("stroke", "red")
 	    .attr("stroke-width", "7")
 	    .attr("fill", "white")
+	    .attr("name", d => d.properties.name)
 	    .attr("d", d3.geoPath().projection(state_projection))
 	    .classed("state", true)
+	    .on("mouseover", function (d) {
+		console.log(d3.select(this))
+		tooltip.style('visisbility', 'visible')
+		tooltip.text("County : " + d3.select(this).attr("name") + " population ")
+		d3.select(this).attr("fill", "blue")
+	    })
+
+	    .on("mousemove", function (d) {
+		return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
+	    })
+	    .on("mouseout", function(d) {
+		d3.select(this).attr("fill", "white")
+	    })
         // .attr("s", d => {console.log(d)} )
 	
     }
-
-
-
-
-
-
-
 
     state_borders.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.states).features)
@@ -207,22 +217,16 @@ var color = d3.scaleQuantize()
 	.attr("fill", "white")
         .attr("state-id", d => d.id)
 	.attr("d", d3.geoPath().projection(projection))
-        .on("mouseover", function (d) {
-
-	    state_id = d3.select(this).attr("state-id")
-	    // display_state(state_id)
-	    d3.select(this).attr("fill", "blue")
-
-	})
+	.attr("name", d => d.properties.name)
 	.classed("state", true)
 
     county_borders.selectAll("path")
 	.data(topojson.feature(uk, uk.objects.counties).features)
 	.enter().append("path")
         .attr("fill", "white")
-        .attr("fill-opacity", "0.0")
         .attr("pointer-events", "none")
         .attr("stroke", "red")
+	.attr("name", d => d.properties.name)
 	.attr("d", d3.geoPath().projection(projection))
         .classed("county", true)
 
