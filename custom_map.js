@@ -5,6 +5,7 @@
 var width = 1000,
     height = 500;
 
+
 var maps = d3.select("body").select(".row").select(".map")
 
 var state_map = d3.select("body").select(".row").select(".state")
@@ -16,6 +17,8 @@ var svg = maps.append("svg")
     .attr("display", "block")
     .attr("margin", "auto");
 
+var possible_selection = ["rate", "total_pop", "jail_pop", "total_prison_pop"]
+var cur_select = 0
 
 var county_borders = svg.append("g").classed("countys", true)// .attr("class", "countys")
 
@@ -45,69 +48,72 @@ var projection = d3.geoAlbersUsa().scale(1000)
 
 var file = 'county-prison-1970'
 
-// This is where all the user input is collcted
-
-// Race selector
-// Rece menu
-
-d3.select(".race-menu").select(".white")
-    .on("click", function (d) {
-	console.log("white")
-    })
-
-d3.select(".race-menu").select(".black")
-    .on("click", function (d) {
-	console.log("black")
-    })
-
-d3.select(".race-menu").select(".latinx")
-    .on("click", function (d) {
-	console.log("latinx")
-    })
-
-d3.select(".race-menu").select(".native")
-    .on("click", function (d) {
-	console.log("Native")
-    })
-
-// Gender selector 
-// Male population button
-d3.select(".gender-menu").select(".male")
-    .on("click", function (d) {
-	console.log("Male")
-    })
-
-// Female population button
-d3.select(".gender-menu").select(".female")
-    .on("click", function (d) {
-	console.log("Female")
-    })
-
-
-// Prison selector
-// Prison population button
-d3.select(".jail-menu").select(".prison-population")
-    .on("click", function (d) {
-	console.log("prison")
-    })
-
-// Jail pop  button
-d3.select(".jail-menu").select(".jail-population")
-    .on("click", function (d) {
-	console.log("jail-population")
-    })
-
-// Incarceratioin rate button
-d3.select(".jail-menu").select(".incarceration-rate")
-    .on("click", function (d) {
-	console.log("incarceration rate")
-    })
 
 // This is where the GeoJSON is loaded and renderd on the wensite as SVG elements
 
-
 d3.json('counties.json').then( function(uk) {
 
+
+    var g_year = 0
+    // This is where all the user input is collcted
+    
+    // Race selector
+    // Rece menu
+    
+    d3.select(".race-menu").select(".white")
+	.on("click", function (d) {
+	    console.log("white")
+	})
+    
+    d3.select(".race-menu").select(".black")
+	.on("click", function (d) {
+	    console.log("black")
+	})
+    
+    d3.select(".race-menu").select(".latinx")
+	.on("click", function (d) {
+	    console.log("latinx")
+	})
+    
+    d3.select(".race-menu").select(".native")
+	.on("click", function (d) {
+	    console.log("Native")
+	})
+    
+    // Gender selector 
+    // Male population button
+    d3.select(".gender-menu").select(".male")
+	.on("click", function (d) {
+	    console.log("Male")
+	})
+    
+    // Female population button
+    d3.select(".gender-menu").select(".female")
+	.on("click", function (d) {
+	    console.log("Female")
+	})
+    
+    
+    // Prison selector
+    // Prison population button
+    d3.select(".jail-menu").select(".prison-population")
+	.on("click", function (d) {
+	    cur_select = 3
+	    change_map(g_year)
+	})
+    
+    // Jail pop  button
+    d3.select(".jail-menu").select(".jail-population")
+	.on("click", function (d) {
+	    cur_select = 2 
+	})
+    
+    // Incarceratioin rate button
+    d3.select(".jail-menu").select(".incarceration-rate")
+	.on("click", function (d) {
+	    cur_select = 0
+	})
+    
   var slider = d3
     .sliderHorizontal()
     .min(1970)
@@ -118,6 +124,7 @@ d3.json('counties.json').then( function(uk) {
     .on('onchange', (val) => {
         file = 'county-prison-'
 	file += val
+	g_year = file
         change_map(file)
     });
 
@@ -129,7 +136,6 @@ d3.json('counties.json').then( function(uk) {
     .attr('transform', 'translate(30,30)')
     .call(slider);
 
-
 	states = topojson.feature(uk, uk.objects.states)
 	statemap = new Map(states.features.map(d => [d.id, d]))
         console.log(uk)
@@ -137,26 +143,22 @@ d3.json('counties.json').then( function(uk) {
 
 	colors = ['#F4F1DE','#E07A5F','#3D405B','#81B29A','#F2CC8F']
 
-
 var color = d3.scaleQuantize()
-
-
 
 // d3.select('.slider').select('input').attr('min',r_min ).attr('max',r_max) 
 
-
     // This is where the map is changes when the slider is slid
-    function change_map (file, data_type) {
+    function change_map (file) {
 	    d3.csv('csv/' + file + '.csv').then( function(county) {
 
 		color.range(colors)
-    .domain([d3.min(county, d => parseFloat(d.total_prison_pop) ), d3.max(county, d => parseFloat(d.total_prison_pop))])
+		    .domain([d3.min(county, d => parseFloat(d[possible_selection[cur_select]]) ), d3.max(county, d => parseFloat(d[possible_selection[cur_select]]))])
 
       // debugging log for easy viewing of the data
 	for (var i = 0; i < county.length; i++) {
 	    
 	    var county_name = county[i].county
-	    var val = parseFloat(county[i].total_prison_pop)
+	    var val = parseFloat(county[i][possible_selection[cur_select]])
 	    var year = county[i].year
 	    var fips = county[i].fips.slice(0,2)
 	    
