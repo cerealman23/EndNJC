@@ -17,7 +17,11 @@ var svg = maps.append("svg")
     .attr("display", "block")
     .attr("margin", "auto");
 
-var possible_selection = ["rate", "total_pop", "jail_pop", "total_prison_pop"]
+
+
+                        
+var possible_selection = ["rate", "total_pop", "jail_pop", "total_prison_pop", "female_jail_pop_rate","male_jail_pop_rate","white_jail_pop_rate"]
+
 var cur_select = 0
 
 var county_borders = svg.append("g").classed("countys", true)// .attr("class", "countys")
@@ -53,66 +57,7 @@ var file = 'county-prison-1970'
 
 d3.json('counties.json').then( function(uk) {
 
-
     var g_year = 0
-    // This is where all the user input is collcted
-    
-    // Race selector
-    // Rece menu
-    
-    d3.select(".race-menu").select(".white")
-	.on("click", function (d) {
-	    console.log("white")
-	})
-    
-    d3.select(".race-menu").select(".black")
-	.on("click", function (d) {
-	    console.log("black")
-	})
-    
-    d3.select(".race-menu").select(".latinx")
-	.on("click", function (d) {
-	    console.log("latinx")
-	})
-    
-    d3.select(".race-menu").select(".native")
-	.on("click", function (d) {
-	    console.log("Native")
-	})
-    
-    // Gender selector 
-    // Male population button
-    d3.select(".gender-menu").select(".male")
-	.on("click", function (d) {
-	    console.log("Male")
-	})
-    
-    // Female population button
-    d3.select(".gender-menu").select(".female")
-	.on("click", function (d) {
-	    console.log("Female")
-	})
-    
-    
-    // Prison selector
-    // Prison population button
-    d3.select(".jail-menu").select(".prison-population")
-	.on("click", function (d) {
-	    cur_select = 3
-	    change_map(g_year)
-	})
-    
-    // Jail pop  button
-    d3.select(".jail-menu").select(".jail-population")
-	.on("click", function (d) {
-	    cur_select = 2 
-	})
-    
-    // Incarceratioin rate button
-    d3.select(".jail-menu").select(".incarceration-rate")
-	.on("click", function (d) {
-	    cur_select = 0
-	})
     
   var slider = d3
     .sliderHorizontal()
@@ -142,6 +87,11 @@ d3.json('counties.json').then( function(uk) {
 	statemesh = topojson.mesh(uk, uk.objects.states, (a, b) => a !== b)
 
 	colors = ['#F4F1DE','#E07A5F','#3D405B','#81B29A','#F2CC8F']
+
+d3.selectAll("a").on("click", function (d) {
+    cur_select = d3.select(this).attr("dthree-index")
+    change_map(g_year)
+})
 
 var color = d3.scaleQuantize()
 
