@@ -97,6 +97,8 @@ var color = d3.scaleQuantize()
 
 // d3.select('.slider').select('input').attr('min',r_min ).attr('max',r_max) 
 
+    // The selected state to display
+    var state_id = 0
     // This is where the map is changes when the slider is slid
     function change_map (file) {
 	    d3.csv('csv/' + file + '.csv').then( function(county) {
@@ -139,7 +141,8 @@ var color = d3.scaleQuantize()
 		}
 	    })
 	    .attr("prop", function (d) {return d.properties.values })
-	
+
+		
 	state_borders.selectAll("path")
 	    .attr("stroke", "black")
 	    .attr("stroke-width", "7")
@@ -163,6 +166,13 @@ var color = d3.scaleQuantize()
 		d3.select(this).attr("fill-opacity", "0")
 	    })
 
+		console.log(state_id)
+		console.log("Herer is state id")
+		if (state_id != 0) {
+		    console.log("here I am")
+		    display_state(state_id)   
+		}
+		
         })};	
     // Display the state in which was selected by the user
 
@@ -173,25 +183,6 @@ var color = d3.scaleQuantize()
 	    var counties = topojson.feature(uk, uk.objects.counties)
 		.features
 		.filter(function(d) {return d.id.slice(0,2) == state_id;})
-
-	    // for (var i = 0; i < county.length; i++) {
-
-	    // 	var fips = county[i].fips.slice(0,2)
-	    // 	var val = parseFloat(county[i].total_prison_pop)
-
-
-	    // 	for (var j = 0; j < counties; j++) {
-
-	    // 	    county_id = counties[i].id.slice(0, 2)
-
-	    // 	    if (fips == county_id) {
-	    // 		counties.properties.values_state = val
-	    // 	    }
-
-	    // 	}
-
-	    // }
-
 
 	    var new_color = d3.scaleQuantize()
 		.range(colors)
