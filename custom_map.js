@@ -2,8 +2,8 @@
 
 // This is where I add all the html elements 
   
-var width = 1300,
-    height = 1000;
+var width = 1000,
+    height = 500;
 
 var maps = d3.select("body").select(".row").select(".map")
 
@@ -12,7 +12,9 @@ var state_map = d3.select("body").select(".row").select(".state")
 var svg = maps.append("svg")
     .attr("width", width)
     .attr("class", "state-map")
-    .attr("height", height);
+    .attr("height", height)
+    .attr("display", "block")
+    .attr("margin", "auto");
 
 
 var county_borders = svg.append("g").classed("countys", true)// .attr("class", "countys")
@@ -27,20 +29,82 @@ var tooltip = d3.select('body')
     .append('div')
     .attr('width', '200')
     .attr('height', '200')
+    .attr("pointer-events", "none")
     .style("position", "absolute")
     .text("I'm a circle!")
+    .attr("pointer-events", "none")
     .attr('color', 'white')
     .style("background-color", "white")
     .style("border", "solid")
     .style("border-width", "2px")
     .style("border-radius", "5px")
     .style("padding", "5px")
-    .attr("pointer-events", "none")
 
 
 var projection = d3.geoAlbersUsa().scale(1000)
 
 var file = 'county-prison-1970'
+
+// This is where all the user input is collcted
+
+// Race selector
+// Rece menu
+
+d3.select(".race-menu").select(".white")
+    .on("click", function (d) {
+	console.log("white")
+    })
+
+d3.select(".race-menu").select(".black")
+    .on("click", function (d) {
+	console.log("black")
+    })
+
+d3.select(".race-menu").select(".latinx")
+    .on("click", function (d) {
+	console.log("latinx")
+    })
+
+d3.select(".race-menu").select(".native")
+    .on("click", function (d) {
+	console.log("Native")
+    })
+
+// Gender selector 
+// Male population button
+d3.select(".gender-menu").select(".male")
+    .on("click", function (d) {
+	console.log("Male")
+    })
+
+// Female population button
+d3.select(".gender-menu").select(".female")
+    .on("click", function (d) {
+	console.log("Female")
+    })
+
+
+// Prison selector
+// Prison population button
+d3.select(".jail-menu").select(".prison-population")
+    .on("click", function (d) {
+	console.log("prison")
+    })
+
+// Jail pop  button
+d3.select(".jail-menu").select(".jail-population")
+    .on("click", function (d) {
+	console.log("jail-population")
+    })
+
+// Incarceratioin rate button
+d3.select(".jail-menu").select(".incarceration-rate")
+    .on("click", function (d) {
+	console.log("incarceration rate")
+    })
+
+// This is where the GeoJSON is loaded and renderd on the wensite as SVG elements
+
 
 d3.json('counties.json').then( function(uk) {
 
@@ -82,10 +146,10 @@ var color = d3.scaleQuantize()
 
 
     // This is where the map is changes when the slider is slid
-	function change_map (file) {
-    d3.csv('csv/' + file + '.csv').then( function(county) {
+    function change_map (file, data_type) {
+	    d3.csv('csv/' + file + '.csv').then( function(county) {
 
-    color.range(colors)
+		color.range(colors)
     .domain([d3.min(county, d => parseFloat(d.total_prison_pop) ), d3.max(county, d => parseFloat(d.total_prison_pop))])
 
       // debugging log for easy viewing of the data
@@ -125,20 +189,23 @@ var color = d3.scaleQuantize()
 	    .attr("prop", function (d) {return d.properties.values })
 	
 	state_borders.selectAll("path")
-	    .attr("stroke", "blue")
+	    .attr("stroke", "black")
 	    .attr("stroke-width", "7")
 	    .attr("fill", "white")
-	    .on("mouseover", function (d) {
+	    .on("click", function (d) {
+
 		tooltip.style('visisbility', 'visible')
 		tooltip.text("State : " + d3.select(this).attr("name") + " population ")
 		state_id = d3.select(this).attr("state-id")
+
 		display_state(state_id)
 		d3.select(this).attr("fill", "blue")
 		d3.select(this).attr("fill-opacity", "1")
+
 	    })
 
 	    .on("mousemove", function (d) {
-		return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
+		return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX + 5)+"px");
 	    })
 	    .on("mouseout", function(d) {
 		d3.select(this).attr("fill-opacity", "0")
@@ -195,7 +262,7 @@ var color = d3.scaleQuantize()
 	    svg_state.selectAll("path")
 		.data(counties)
 		.enter().append("path")
-		.attr("stroke", "red")
+		.attr("stroke", "black")
 		.attr("stroke-width", "7")
 		.attr("fill", function(d) {
 		    // all void data is set to a white color
@@ -214,14 +281,13 @@ var color = d3.scaleQuantize()
 		.on("mouseover", function (d) {
 		    tooltip.style('visisbility', 'visible')
 		    tooltip.text("County : " + d3.select(this).attr("name") + " population: " + d3.select(this).attr("current_value"))
-		    d3.select(this).attr("fill", "blue")
+		    // d3.select(this).attr("fill", "blue")
 		})
 	    
 		.on("mousemove", function (d) {
 		    return tooltip.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");
 		})
 		.on("mouseout", function(d) {
-		    d3.select(this).attr("fill", "white")
 		})
 	
 	})}
@@ -230,7 +296,7 @@ var color = d3.scaleQuantize()
 	.data(topojson.feature(uk, uk.objects.states).features)
 	.enter().append("path")
         .attr("fill-opacity", "0.0")
-	.attr("stroke", "blue")
+	.attr("stroke", "black")
 	.attr("stroke-width", "7")
         .attr("state-id", d => d.id)
 	.attr("d", d3.geoPath().projection(projection))
@@ -242,7 +308,7 @@ var color = d3.scaleQuantize()
 	.enter().append("path")
         .attr("fill", "pink")
         .attr("pointer-events", "none")
-        .attr("stroke", "red")
+        .attr("stroke", "black")
 	.attr("name", d => d.properties.name)
 	.attr("d", d3.geoPath().projection(projection))
         .classed("county", true)

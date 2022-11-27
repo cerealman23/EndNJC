@@ -21,9 +21,6 @@ class FormData
 
   end
 
-
-
-
   def data_based_on_year 
     csv = CSV.read("incarceration_trends.csv")
     total = 0
@@ -42,6 +39,7 @@ class FormData
           if row[2].length < 5
             fips = fips.insert(0, "0")
           end
+          # fips", "county", "rate", "year", "total_pop", "jail_pop", "total_prison_pop
           final_struct << [fips, extract_county(row[4]), row[95], row[1], row[5], row[20], row[105]]
         end 
 
