@@ -69,7 +69,7 @@ d3.json('counties.json').then( function(uk) {
     .on('onchange', (val) => {
         file = 'county-prison-'
 	file += val
-	g_year = file
+	g_year = val
         change_map(file)
     });
 
@@ -90,7 +90,8 @@ d3.json('counties.json').then( function(uk) {
 
 d3.selectAll("a").on("click", function (d) {
     cur_select = d3.select(this).attr("dthree-index")
-    change_map(g_year)
+    change_map("county-prison-" + g_year)
+    d3.select(".map").select("p.h1").text("Heat map of " + possible_selection[cur_select] + " during " + g_year)
 })
 
 var color = d3.scaleQuantize()

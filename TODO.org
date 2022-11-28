@@ -1,0 +1,25 @@
+* Visual
+
+** DONE Update state when slider is selected
+
+** TODO Put in a pretty box
+** TODO Prettier tool-tip
+** DONE State borders
+** TODO constant color scales or adjustable scales 
+   constant makes more sense for this to work I would need to calculate max and min for whole data set
+** TODO Animations
+** TODO Better words that describes exactly what goes down
+* Funtional
+
+** INACTIVE Line graph below it all
+*** TODO Line graph is based on selection of states
+
+** DONE County name on hover
+** DONE Minimum and maximum based on year
+* Refractoring
+
+** DONE Put states into groups and counties into groups 
+** Is it smart to havea seperate file or data struct for each year
+Minimums and maximums need to be calculated per year, plus I want to dynamically have the map adjust based on year so data needs to be proloaded and preformatted, potentiall even pre-made scales before load
+* If there is time make
+** DONE multuple categories selctabel
